@@ -73,8 +73,8 @@ bot.on('message', async message => {
     const out = new Elements();
     out.add({text: `hey ${sender.first_name}, how are you!`});
 
-    await bot.setTyping(sender.id, 'typing_on');
-    await bot.setTyping(sender.id, 'typing_off');
+    await bot.setTyping(sender.id, true);
+    await bot.setTyping(sender.id, false);
     await Bot.wait(1000)
     await bot.send(sender.id, out);
 });
