@@ -75,6 +75,7 @@ bot.on('message', async message => {
 
     await bot.setTyping(sender.id, 'typing_on');
     await bot.setTyping(sender.id, 'typing_off');
+    await Bot.wait(1000)
     await bot.send(sender.id, out);
 });
 
