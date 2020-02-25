@@ -73,7 +73,9 @@ bot.on('message', async message => {
     const out = new Elements();
     out.add({text: `hey ${sender.first_name}, how are you!`});
 
+    await bot.setTyping(sender.id, 'typing_on');
     await bot.send(sender.id, out);
+    await bot.setTyping(sender.id, 'typing_off');
 });
 
 // const app = express();
