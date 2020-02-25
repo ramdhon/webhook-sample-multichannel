@@ -67,7 +67,7 @@ const bot = new Bot(PAGE_ACCESS_TOKEN, VALIDATION_TOKEN);
 })();
 
 bot.on('message', async message => {
-    console.log(JSON.stringify({ message }))
+    console.log(JSON.stringify({ message }, 2))
 
     const {sender} = message;
     await sender.fetch('first_name');
