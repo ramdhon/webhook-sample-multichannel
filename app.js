@@ -59,6 +59,13 @@ if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
 const { Bot, Elements } = require('./submodules/facebook-messenger-bot');
 const bot = new Bot(PAGE_ACCESS_TOKEN, VALIDATION_TOKEN);
 
+(async function () {
+  console.log(await bot.setGreeting('Hi my name is Freedaa, I can help find free food around and share the free food you find!'));
+  console.log(await bot.setGetStarted({data: {action: 'GET_STARTED'}}));
+
+  // console.log(await bot.setGetStarted(null)); // DELETE greeting
+})();
+
 bot.on('message', async message => {
     const {sender} = message;
     await sender.fetch('first_name');
