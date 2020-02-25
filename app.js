@@ -75,7 +75,6 @@ bot.on('message', async message => {
 
     await bot.setTyping(sender.id, 'typing_on');
     await bot.send(sender.id, out);
-    await bot.setTyping(sender.id, 'typing_off');
 });
 
 // const app = express();
