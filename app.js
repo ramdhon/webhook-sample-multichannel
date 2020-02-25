@@ -60,18 +60,20 @@ const { Bot, Elements } = require('./submodules/facebook-messenger-bot');
 const bot = new Bot(PAGE_ACCESS_TOKEN, VALIDATION_TOKEN);
 
 (async function () {
-  console.log('SET GREETING', await bot.setGreeting('Hi my name is Freedaa, I can help find free food around and share the free food you find!'));
+  console.log('SET GREETING', await bot.setGreeting('Hi I am KR Dev Boy, how can I help you?'));
   console.log('GET STARTED', await bot.setGetStarted({data: {action: 'GET_STARTED'}}));
 
   // console.log(await bot.setGetStarted(null)); // DELETE greeting
 })();
 
 bot.on('message', async message => {
+    console.log(JSON.stringify({ message }))
+
     const {sender} = message;
     await sender.fetch('first_name');
 
     const out = new Elements();
-    out.add({text: `hey ${sender.first_name}, how are you!`});
+    out.add({text: `Hey ${sender.first_name}, how are you!`});
 
     await bot.setTyping(sender.id, true);
     await Bot.wait(1000);
