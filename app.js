@@ -57,6 +57,12 @@ if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
   process.exit(1);
 }
 
+/*
+ * This is part of using FacebookMessenger.js package
+ *
+ */
+// BEGIN ================================================================================
+
 // const { Bot, Elements } = require('./submodules/facebook-messenger-bot');
 // const bot = new Bot(PAGE_ACCESS_TOKEN, VALIDATION_TOKEN);
 
@@ -85,6 +91,16 @@ if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
 // const app = express();
 // app.use('/webhook', bot.router());
 // app.listen(3000);
+
+// END ================================================================================
+
+
+/*
+ * This is part of using sample package from facebook messenger getting started
+ *
+ */
+
+// BEGIN ================================================================================
 
 /*
  * Use your own validation token. Check that the token used in the Webhook
@@ -924,6 +940,8 @@ function callSendAPI(messageData) {
     }
   });
 }
+
+// END ================================================================================
 
 // Start server
 // Webhooks must be available via SSL with a certificate signed by a valid
