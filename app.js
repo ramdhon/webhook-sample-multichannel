@@ -10,6 +10,7 @@
 /* jshint node: true, devel: true */
 'use strict';
 
+require('dotenv').config();
 const
   bodyParser = require('body-parser'),
   config = require('config'),
@@ -56,33 +57,33 @@ if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
   process.exit(1);
 }
 
-const { Bot, Elements } = require('./submodules/facebook-messenger-bot');
-const bot = new Bot(PAGE_ACCESS_TOKEN, VALIDATION_TOKEN);
+// const { Bot, Elements } = require('./submodules/facebook-messenger-bot');
+// const bot = new Bot(PAGE_ACCESS_TOKEN, VALIDATION_TOKEN);
 
-(async function () {
-  console.log('SET GREETING', await bot.setGreeting('Hi I am KR Dev Boy, how can I help you?'));
-  console.log('GET STARTED', await bot.setGetStarted({data: {action: 'GET_STARTED'}}));
+// (async function () {
+//   console.log('SET GREETING', await bot.setGreeting('Hi I am KR Dev Boy, how can I help you?'));
+//   console.log('GET STARTED', await bot.setGetStarted({data: {action: 'GET_STARTED'}}));
 
-  // console.log(await bot.setGetStarted(null)); // DELETE greeting
-})();
+//   // console.log(await bot.setGetStarted(null)); // DELETE greeting
+// })();
 
-bot.on('message', async message => {
-    console.log('FROM APP', JSON.stringify({ message }, null, 2))
+// bot.on('message', async message => {
+//     console.log('FROM APP', JSON.stringify({ message }, null, 2))
 
-    const {sender} = message;
-    await sender.fetch('first_name');
+//     const {sender} = message;
+//     await sender.fetch('first_name');
 
-    const out = new Elements();
-    out.add({text: `Hey ${sender.first_name}, how are you!`});
+//     const out = new Elements();
+//     out.add({text: `Hey ${sender.first_name}, how are you!`});
 
-    await bot.setTyping(sender.id, true);
-    await Bot.wait(1000);
-    await bot.setTyping(sender.id, false);
-    await bot.send(sender.id, out);
-});
+//     await bot.setTyping(sender.id, true);
+//     await Bot.wait(1000);
+//     await bot.setTyping(sender.id, false);
+//     await bot.send(sender.id, out);
+// });
 
 // const app = express();
-app.use('/webhook', bot.router());
+// app.use('/webhook', bot.router());
 // app.listen(3000);
 
 /*
@@ -90,19 +91,19 @@ app.use('/webhook', bot.router());
  * setup is the same token used here.
  *
  */
-// app.get('/webhook', function(req, res) {
+app.get('/webhook', function(req, res) {
 
-//   console.log('/WEBHOOK GET called!', { query: req.query });
+  console.log('/WEBHOOK GET called!', { query: req.query });
   
-//   if (req.query['hub.mode'] === 'subscribe' &&
-//       req.query['hub.verify_token'] === VALIDATION_TOKEN) {
-//     console.log("Validating webhook");
-//     res.status(200).send(req.query['hub.challenge']);
-//   } else {
-//     console.error("Failed validation. Make sure the validation tokens match.");
-//     res.sendStatus(403);
-//   }
-// });
+  if (req.query['hub.mode'] === 'subscribe' &&
+      req.query['hub.verify_token'] === VALIDATION_TOKEN) {
+    console.log("Validating webhook");
+    res.status(200).send(req.query['hub.challenge']);
+  } else {
+    console.error("Failed validation. Make sure the validation tokens match.");
+    res.sendStatus(403);
+  }
+});
 
 
 /*
@@ -112,51 +113,51 @@ app.use('/webhook', bot.router());
  * https://developers.facebook.com/docs/messenger-platform/product-overview/setup#subscribe_app
  *
  */
-// app.post('/webhook', function (req, res) {
-//   var data = req.body;
+app.post('/webhook', function (req, res) {
+  var data = req.body;
 
-//   console.log('/WEBHOOK POST called!', { data });
+  console.log('/WEBHOOK POST called!', { data });
 
-//   // Make sure this is a page subscription
-//   if (data.object == 'page') {
-//     // Iterate over each entry
-//     // There may be multiple if batched
-//     data.entry.forEach(function(pageEntry) {
-//       var pageID = pageEntry.id;
-//       var timeOfEvent = pageEntry.time;
+  // Make sure this is a page subscription
+  if (data.object == 'page') {
+    // Iterate over each entry
+    // There may be multiple if batched
+    data.entry.forEach(function(pageEntry) {
+      var pageID = pageEntry.id;
+      var timeOfEvent = pageEntry.time;
 
-//       console.log({ pageEntry });
+      console.log({ pageEntry });
 
-//       // Iterate over each messaging event
-//       pageEntry.messaging.forEach(function(messagingEvent) {
+      // Iterate over each messaging event
+      pageEntry.messaging.forEach(function(messagingEvent) {
         
-//         console.log({ messagingEvent });
+        console.log({ messagingEvent });
 
-//         if (messagingEvent.optin) {
-//           receivedAuthentication(messagingEvent);
-//         } else if (messagingEvent.message) {
-//           receivedMessage(messagingEvent);
-//         } else if (messagingEvent.delivery) {
-//           receivedDeliveryConfirmation(messagingEvent);
-//         } else if (messagingEvent.postback) {
-//           receivedPostback(messagingEvent);
-//         } else if (messagingEvent.read) {
-//           receivedMessageRead(messagingEvent);
-//         } else if (messagingEvent.account_linking) {
-//           receivedAccountLink(messagingEvent);
-//         } else {
-//           console.log("Webhook received unknown messagingEvent: ", messagingEvent);
-//         }
-//       });
-//     });
+        if (messagingEvent.optin) {
+          receivedAuthentication(messagingEvent);
+        } else if (messagingEvent.message) {
+          receivedMessage(messagingEvent);
+        } else if (messagingEvent.delivery) {
+          receivedDeliveryConfirmation(messagingEvent);
+        } else if (messagingEvent.postback) {
+          receivedPostback(messagingEvent);
+        } else if (messagingEvent.read) {
+          receivedMessageRead(messagingEvent);
+        } else if (messagingEvent.account_linking) {
+          receivedAccountLink(messagingEvent);
+        } else {
+          console.log("Webhook received unknown messagingEvent: ", messagingEvent);
+        }
+      });
+    });
 
-//     // Assume all went well.
-//     //
-//     // You must send back a 200, within 20 seconds, to let us know you've
-//     // successfully received the callback. Otherwise, the request will time out.
-//     res.sendStatus(200);
-//   }
-// });
+    // Assume all went well.
+    //
+    // You must send back a 200, within 20 seconds, to let us know you've
+    // successfully received the callback. Otherwise, the request will time out.
+    res.sendStatus(200);
+  }
+});
 
 /*
  * This path is used for account linking. The account linking call-to-action
