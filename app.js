@@ -58,38 +58,131 @@ if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
 }
 
 /*
+ * This is part of using BOTKIT package
+ *
+ */
+// BEGIN ================================================================================
+
+// const { Botkit } = require('botkit');
+// const { FacebookAdapter } = require('botbuilder-adapter-facebook');
+
+// const adapter = new FacebookAdapter({
+//      verify_token: VALIDATION_TOKEN,
+//      app_secret: APP_SECRET,
+//      access_token: PAGE_ACCESS_TOKEN
+// });
+
+// const controller = new Botkit({
+//   adapter,
+//   // ...other options
+// });
+
+// // Log every message received
+// controller.middleware.receive.use(function(bot, message, next) {
+
+//   // log it
+//   console.log('RECEIVED: ', message);
+
+//   // modify the message
+//   message.logged = true;
+
+//   // continue processing the message
+//   next();
+
+// });
+
+// // Log every message sent
+// controller.middleware.send.use(function(bot, message, next) {
+
+//   // log it
+//   console.log('SENT: ', message);
+
+//   // modify the message
+//   message.logged = true;
+
+//   // continue processing the message
+//   next();
+
+// });
+
+// controller.on('message', async(bot, message) => {
+//   await bot.reply(message, 'I heard a message!');
+// });
+
+// app.get('/webhook', (req, res) => {
+//   if (req.query['hub.mode'] === 'subscribe') {
+//     if (req.query['hub.verify_token'] === VALIDATION_TOKEN) {
+//       const val = req.query['hub.challenge'];
+//       res.sendRaw(200, val);
+//     } else {
+//       console.log('failed to verify endpoint');
+//       res.send('OK');
+//     }
+//   }
+// });
+
+// app.post('/webhook', (req, res) => {
+//   console.log('DATA', JSON.stringify(req.body, null, 2));
+
+//   controller.hears('hello','direct_message', function(bot, message) {
+//     bot.reply(message,'Hello yourself!');
+//   });
+//   // adapter.processActivity(req, res, async(context) => {
+//   //   console.log({ context })
+//   //   try {
+//   //     await context.sendActivity('I heard a message!');
+//   //   }
+//   //   catch (err) {
+//   //     console.log('ERROR LOG:', {err})
+//   //   }
+//   // });
+// });
+
+// // server.listen(process.env.port || process.env.PORT || 3000, () => {
+// //      console.log(`\n${ server.name } listening to ${ server.url }`);
+// //  });
+
+
+// END ================================================================================
+
+/*
  * This is part of using FacebookMessenger.js package
  *
  */
 // BEGIN ================================================================================
 
-// const { Bot, Elements } = require('./submodules/facebook-messenger-bot');
-// const bot = new Bot(PAGE_ACCESS_TOKEN, VALIDATION_TOKEN);
+const { Bot, Elements } = require('./submodules/facebook-messenger-bot');
+const bot = new Bot(PAGE_ACCESS_TOKEN, VALIDATION_TOKEN);
 
-// (async function () {
-//   console.log('SET GREETING', await bot.setGreeting('Hi I am KR Dev Boy, how can I help you?'));
-//   console.log('GET STARTED', await bot.setGetStarted({data: {action: 'GET_STARTED'}}));
+(async function () {
+  try {
+    console.log('SET GREETING', await bot.setGreeting('Hi I am KR Dev Boy, how can I help you?'));
+    console.log('GET STARTED', await bot.setGetStarted({data: {action: 'GET_STARTED'}}));
+  }
+  catch (err) {
+    console.log('ERROR LOG:', { err });
+  }
 
-//   // console.log(await bot.setGetStarted(null)); // DELETE greeting
-// })();
+  // console.log(await bot.setGetStarted(null)); // DELETE greeting
+})();
 
-// bot.on('message', async message => {
-//     console.log('FROM APP', JSON.stringify({ message }, null, 2))
+bot.on('message', async message => {
+    console.log('FROM APP', JSON.stringify({ message }, null, 2))
 
-//     const {sender} = message;
-//     await sender.fetch('first_name');
+    const {sender} = message;
+    await sender.fetch('first_name');
 
-//     const out = new Elements();
-//     out.add({text: `Hey ${sender.first_name}, how are you!`});
+    const out = new Elements();
+    out.add({text: `Hey ${sender.first_name}, how are you!`});
 
-//     await bot.setTyping(sender.id, true);
-//     await Bot.wait(1000);
-//     await bot.setTyping(sender.id, false);
-//     await bot.send(sender.id, out);
-// });
+    await bot.setTyping(sender.id, true);
+    await Bot.wait(1000);
+    await bot.setTyping(sender.id, false);
+    await bot.send(sender.id, out);
+});
 
 // const app = express();
-// app.use('/webhook', bot.router());
+app.use('/webhook', bot.router());
 // app.listen(3000);
 
 // END ================================================================================
@@ -102,104 +195,104 @@ if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
 
 // BEGIN ================================================================================
 
-/*
- * Use your own validation token. Check that the token used in the Webhook
- * setup is the same token used here.
- *
- */
-app.get('/webhook', function(req, res) {
+// /*
+//  * Use your own validation token. Check that the token used in the Webhook
+//  * setup is the same token used here.
+//  *
+//  */
+// app.get('/webhook', function(req, res) {
 
-  console.log('/WEBHOOK GET called!', { query: req.query });
+//   console.log('/WEBHOOK GET called!', { query: req.query });
   
-  if (req.query['hub.mode'] === 'subscribe' &&
-      req.query['hub.verify_token'] === VALIDATION_TOKEN) {
-    console.log("Validating webhook");
-    res.status(200).send(req.query['hub.challenge']);
-  } else {
-    console.error("Failed validation. Make sure the validation tokens match.");
-    res.sendStatus(403);
-  }
-});
+//   if (req.query['hub.mode'] === 'subscribe' &&
+//       req.query['hub.verify_token'] === VALIDATION_TOKEN) {
+//     console.log("Validating webhook");
+//     res.status(200).send(req.query['hub.challenge']);
+//   } else {
+//     console.error("Failed validation. Make sure the validation tokens match.");
+//     res.sendStatus(403);
+//   }
+// });
 
 
-/*
- * All callbacks for Messenger are POST-ed. They will be sent to the same
- * webhook. Be sure to subscribe your app to your page to receive callbacks
- * for your page.
- * https://developers.facebook.com/docs/messenger-platform/product-overview/setup#subscribe_app
- *
- */
-app.post('/webhook', function (req, res) {
-  var data = req.body;
+// /*
+//  * All callbacks for Messenger are POST-ed. They will be sent to the same
+//  * webhook. Be sure to subscribe your app to your page to receive callbacks
+//  * for your page.
+//  * https://developers.facebook.com/docs/messenger-platform/product-overview/setup#subscribe_app
+//  *
+//  */
+// app.post('/webhook', function (req, res) {
+//   var data = req.body;
 
-  console.log('/WEBHOOK POST called!', { data });
+//   console.log('/WEBHOOK POST called!', { data });
 
-  // Make sure this is a page subscription
-  if (data.object == 'page') {
-    // Iterate over each entry
-    // There may be multiple if batched
-    data.entry.forEach(function(pageEntry) {
-      var pageID = pageEntry.id;
-      var timeOfEvent = pageEntry.time;
+//   // Make sure this is a page subscription
+//   if (data.object == 'page') {
+//     // Iterate over each entry
+//     // There may be multiple if batched
+//     data.entry.forEach(function(pageEntry) {
+//       var pageID = pageEntry.id;
+//       var timeOfEvent = pageEntry.time;
 
-      console.log({ pageEntry });
+//       console.log({ pageEntry });
 
-      // Iterate over each messaging event
-      pageEntry.messaging.forEach(function(messagingEvent) {
+//       // Iterate over each messaging event
+//       pageEntry.messaging.forEach(function(messagingEvent) {
         
-        console.log({ messagingEvent });
+//         console.log({ messagingEvent });
 
-        if (messagingEvent.optin) {
-          receivedAuthentication(messagingEvent);
-        } else if (messagingEvent.message) {
-          receivedMessage(messagingEvent);
-        } else if (messagingEvent.delivery) {
-          receivedDeliveryConfirmation(messagingEvent);
-        } else if (messagingEvent.postback) {
-          receivedPostback(messagingEvent);
-        } else if (messagingEvent.read) {
-          receivedMessageRead(messagingEvent);
-        } else if (messagingEvent.account_linking) {
-          receivedAccountLink(messagingEvent);
-        } else {
-          console.log("Webhook received unknown messagingEvent: ", messagingEvent);
-        }
-      });
-    });
+//         if (messagingEvent.optin) {
+//           receivedAuthentication(messagingEvent);
+//         } else if (messagingEvent.message) {
+//           receivedMessage(messagingEvent);
+//         } else if (messagingEvent.delivery) {
+//           receivedDeliveryConfirmation(messagingEvent);
+//         } else if (messagingEvent.postback) {
+//           receivedPostback(messagingEvent);
+//         } else if (messagingEvent.read) {
+//           receivedMessageRead(messagingEvent);
+//         } else if (messagingEvent.account_linking) {
+//           receivedAccountLink(messagingEvent);
+//         } else {
+//           console.log("Webhook received unknown messagingEvent: ", messagingEvent);
+//         }
+//       });
+//     });
 
-    // Assume all went well.
-    //
-    // You must send back a 200, within 20 seconds, to let us know you've
-    // successfully received the callback. Otherwise, the request will time out.
-    res.sendStatus(200);
-  }
-});
+//     // Assume all went well.
+//     //
+//     // You must send back a 200, within 20 seconds, to let us know you've
+//     // successfully received the callback. Otherwise, the request will time out.
+//     res.sendStatus(200);
+//   }
+// });
 
-/*
- * This path is used for account linking. The account linking call-to-action
- * (sendAccountLinking) is pointed to this URL.
- *
- */
-app.get('/authorize', function(req, res) {
+// /*
+//  * This path is used for account linking. The account linking call-to-action
+//  * (sendAccountLinking) is pointed to this URL.
+//  *
+//  */
+// app.get('/authorize', function(req, res) {
 
-  console.log('/AUTHORIZE GET called!', { query: req.query });
+//   console.log('/AUTHORIZE GET called!', { query: req.query });
 
-  var accountLinkingToken = req.query.account_linking_token;
-  var redirectURI = req.query.redirect_uri;
+//   var accountLinkingToken = req.query.account_linking_token;
+//   var redirectURI = req.query.redirect_uri;
 
-  // Authorization Code should be generated per user by the developer. This will
-  // be passed to the Account Linking callback.
-  var authCode = "1234567890";
+//   // Authorization Code should be generated per user by the developer. This will
+//   // be passed to the Account Linking callback.
+//   var authCode = "1234567890";
 
-  // Redirect users to this URI on successful login
-  var redirectURISuccess = redirectURI + "&authorization_code=" + authCode;
+//   // Redirect users to this URI on successful login
+//   var redirectURISuccess = redirectURI + "&authorization_code=" + authCode;
 
-  res.render('authorize', {
-    accountLinkingToken: accountLinkingToken,
-    redirectURI: redirectURI,
-    redirectURISuccess: redirectURISuccess
-  });
-});
+//   res.render('authorize', {
+//     accountLinkingToken: accountLinkingToken,
+//     redirectURI: redirectURI,
+//     redirectURISuccess: redirectURISuccess
+//   });
+// });
 
 /*
  * Verify that the callback came from Facebook. Using the App Secret from
