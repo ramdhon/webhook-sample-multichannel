@@ -169,16 +169,30 @@ const bot = new Bot(PAGE_ACCESS_TOKEN, VALIDATION_TOKEN);
 bot.on('message', async message => {
     console.log('FROM APP', JSON.stringify({ message }, null, 2))
 
-    const {sender} = message;
-    await sender.fetch('first_name');
-
+    const {sender, text} = message;
     const out = new Elements();
-    out.add({text: `Hey ${sender.first_name}, how are you!`});
+    const BIG_TEXT = new RegExp('big text', 'gi');
+    const HI_TEXT = new RegExp('((hi)|(hello))', 'gi');
 
-    await bot.setTyping(sender.id, true);
-    await Bot.wait(1000);
-    await bot.setTyping(sender.id, false);
-    await bot.send(sender.id, out);
+    try {
+      if (BIG_TEXT.test(text)) {
+        const A = Array.apply(null, { length: 2000 });
+        const pesan = A.map((e) => 'a').join('');
+        out.add({ text: pesan });
+      } else if (HI_TEXT.test(text)) {
+        await sender.fetch('first_name');
+        out.add({text: `Hey ${sender.first_name}, how are you!`});
+      } else {
+        out.add({text});
+      }
+
+      await bot.setTyping(sender.id, true);
+      await Bot.wait(1000);
+      await bot.setTyping(sender.id, false);
+      await bot.send(sender.id, out);
+    } catch (err) {
+      console.log('ERROR LOG:', { err });
+    }
 });
 
 // const app = express();
